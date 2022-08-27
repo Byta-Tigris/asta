@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  test:
+    build:
+      context: .
+      docerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+    command: npm run test
