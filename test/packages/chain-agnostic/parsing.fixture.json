@@ -1,0 +1,173 @@
+[       
+        {
+            "in":"",
+            "hasError": true,
+            "errorMessage": "Missing argument (namespace not provided)"
+        },
+        {
+            "in": "eip155:",
+            "hasError": true,
+            "errorMessage": "Missing argument (reference not provided)"
+        },
+        {
+            "in": "#",
+            "hasError": true,
+            "errorMessage": "Invalid argument (namespace does not accept '#' as value)"
+        },
+        {
+            "in": "#:",
+            "hasError": true,
+            "errorMessage": "Invalid argument (namespace does not accept '#' as value)"
+        },
+        {
+            "in": "eip155:#",
+            "hasError": true,
+            "errorMessage": "Invalid argument (reference does not accept '#' as value)"
+        },
+        {
+            "in": "eip155:4",
+            "hasError": true,
+            "out": {
+                "namespace": "eip155",
+                "reference": "1"
+            },
+            "errorMessage": "reference value in chainId is not matching"
+        },
+        {
+            "in": "eip155:1",
+            "hasError": false,
+            "out": {
+                "namespace": "eip155",
+                "reference": "1"
+            }
+        },
+        {
+            "in":"eip155:1:",
+            "hasError": true,
+            "errorMessage": "Missing argument (address not provided)"
+        },
+        {
+            "in":"eip155::0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+            "hasError": true,
+            "errorMessage": "Missing argument (reference not provided)"
+        },
+        {
+            "in":"eip155:1:#",
+            "hasError": true,
+            "errorMessage": "Invalid argument (address does not accept '#' as value)"
+        },
+        {
+            "in":"eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+            "hasError": false,
+            "out": {
+                "address": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+                "namespace":"eip155",
+                "reference": "1",
+                "chainId": {
+                    "namespace":"eip155",
+                    "reference":"1"
+                }
+            }
+        },
+        {
+            "in": "eip155:1/:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+            "hasError":true,
+            "errorMessage": "Missing argument (assetName namespace not provided)"
+        },
+        {
+            "in": "eip155:1/erc721:",
+            "hasError":true,
+            "errorMessage": "Missing argument (assetName reference not provided)"
+        },
+        {
+            "in": "eip155:1/erc721",
+            "hasError":true,
+            "out":{
+                "namespace": "erc721",
+                "chainId": {
+                    "namespace": "eip155",
+                    "reference":"1"
+                },
+                "assetName": {
+                    "namespace": "erc721",
+                    "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+                }
+            },
+            "errorMessage": "Asset name is not defined"
+        },
+        {
+            "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+            "hasError":false,
+            "out":{
+                "namespace": "erc721",
+                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+                "assetName": {
+                    "namespace": "erc721",
+                    "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+                },
+                "chainId": {
+                    "namespace": "eip155",
+                    "reference":"1"
+                }
+            }
+        },
+        {
+            "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/",
+            "hasError":true,
+            "errorMessage": "Missing argument (tokenId not provided)"
+        },
+        {
+            "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/#",
+            "hasError":true,
+            "errorMessage": "Invalid argument (tokenId does not accept '#' as value)"
+        },
+        {
+            "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/1",
+            "hasError":false,
+            "out":{
+                "namespace": "erc721",
+                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+                "tokenId": "1",
+                "assetName": {
+                    "namespace": "erc721",
+                    "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+                },
+                "chainId": {
+                    "namespace": "eip155",
+                    "reference":"1"
+                }
+            }
+        },
+        {
+            "in": "eip155:4/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+            "hasError": false,
+            "out": {
+                "namespace": "erc721",
+                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+                "assetName": {
+                    "namespace": "erc721",
+                    "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+                },
+                "chainId": {
+                    "namespace":"eip155",
+                    "reference":"4"
+                }
+            }
+        },
+        {
+            "in": ["eip155","1","erc721","0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb","1"],
+            "hasError": true,
+            "out": {
+                "namespace": "erc721",
+                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+                "assetName": {
+                    "namespace":"erc721",
+                    "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+                },
+                "chainId": {
+                    "namespace":"eip155",
+                    "reference":"1"
+                }
+            }
+        }
+]

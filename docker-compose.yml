@@ -1,9 +1,19 @@
 version: '3.9'
 services:
+  live:
+    build: 
+      context: .
+      dockerfile: Dockerfile.live
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+      - /app/node_modules
   test:
     build:
       context: .
-      docerfile: Dockerfile.dev
+      dockerfile: Dockerfile.dev
     volumes:
       - .:/app
+      - /app/node_modules
     command: npm run test
