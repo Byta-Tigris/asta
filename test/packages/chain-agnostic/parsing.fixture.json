@@ -2,17 +2,17 @@
         {
             "in":"",
             "hasError": true,
-            "errorMessage": "Missing argument (namespace not provided)"
+            "errorMessage": "Missing argument (reference not provided)"
         },
         {
             "in": "eip155:",
             "hasError": true,
-            "errorMessage": "Missing argument (reference not provided)"
+            "errorMessage": "Invalid argument (namespace does not accept '' as value)"
         },
         {
             "in": "#",
             "hasError": true,
-            "errorMessage": "Invalid argument (namespace does not accept '#' as value)"
+            "errorMessage": "Missing argument (reference not provided)"
         },
         {
             "in": "#:",
@@ -44,12 +44,12 @@
         {
             "in":"eip155:1:",
             "hasError": true,
-            "errorMessage": "Missing argument (address not provided)"
+            "errorMessage": "Invalid argument (address does not accept '' as value)"
         },
         {
             "in":"eip155::0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
             "hasError": true,
-            "errorMessage": "Missing argument (reference not provided)"
+            "errorMessage": "Invalid argument (reference does not accept '' as value)"
         },
         {
             "in":"eip155:1:#",
@@ -72,12 +72,12 @@
         {
             "in": "eip155:1/:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
             "hasError":true,
-            "errorMessage": "Missing argument (assetName namespace not provided)"
+            "errorMessage": "Invalid argument (assetName namespace does not accept '' as value)"
         },
         {
             "in": "eip155:1/erc721:",
             "hasError":true,
-            "errorMessage": "Missing argument (assetName reference not provided)"
+            "errorMessage": "Invalid argument (assetName reference does not accept '' as value)"
         },
         {
             "in": "eip155:1/erc721",
@@ -114,7 +114,7 @@
         {
             "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/",
             "hasError":true,
-            "errorMessage": "Missing argument (tokenId not provided)"
+            "errorMessage": "Invalid argument (tokenId does not accept '' as value)"
         },
         {
             "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/#",
