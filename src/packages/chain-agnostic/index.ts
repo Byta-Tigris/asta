@@ -1,6 +1,6 @@
 import { InvalidChainAgnosticArgument, MissingChainAgnosticArgument } from "@asta/errors";
 import { ChainIdentifierSpecData, ChainAgnosticIdentifierSpecNames } from "./chain-specs";
-import { ChainAgnosticData, ChainIdentifierSpec } from "./types";
+import { AccountId, AccountIdParams, AssetId, AssetIdParams, AssetNameParams, AssetType, AssetTypeParams, ChainAgnosticData, ChainIdentifierSpec, ChainIdParams } from "./types";
 
 
 
@@ -13,10 +13,12 @@ export class ChainAgnostic {
 
     public namespace: string;
     public reference: string;
-    public chainId: ChainAgnosticData["chainId"];
-    public address?: ChainAgnosticData["address"];
-    public assetName?: ChainAgnosticData["assetName"];
-    public tokenId?: ChainAgnosticData["tokenId"];
+    public chainId: ChainIdParams;
+    public address?: string;
+    public assetName?: AssetNameParams;
+    public tokenId?: string;
+
+    private static parentSpecNamesToIncludeInError: string[] = [ChainAgnosticIdentifierSpecNames.AssetName]
 
     private static colonDelim = ':';
     private static slashDelim = '/';
@@ -26,13 +28,78 @@ export class ChainAgnostic {
         if (data !== undefined){
             if(typeof data === 'string'){
                 data = ChainAgnostic.createFragments(data);
+            }else if(typeof data === "object" && (! Array.isArray(data))){
+                data = this.destructObjectData(data);
             }
-    
+     
             if(Array.isArray(data)){
                 this.setupPropertiesFromArray(data);
             }
         }
         
+    }
+
+
+    /**
+     * 
+     * @param data 
+     */
+    destructObjectData(data: Partial<ChainAgnosticData>): string[] {        
+        if(data.tokenId) return this.destructAssetIdObject(data);
+        if(data.address) return this.destructAccountIdData(data);
+        if(data.chainId && (data.assetName || data.namespace))return this.destructAssetTypeData(data);
+        if(data.chainId) return this.destructChainIdOrAssetNameData(data.chainId)
+        return this.destructChainIdOrAssetNameData(data as ChainIdParams);
+        
+    }
+
+    destructChainIdOrAssetNameData(data: string | ChainIdParams | AssetNameParams, ): string [] {
+        if(typeof data === "string") return ChainAgnostic.createFragments(data);
+        return [data.namespace, data.reference];
+    }
+
+    destructAccountIdData(data: Partial<AccountId & ChainIdParams>): string[] {
+        let arr = [];
+        if(data.chainId){
+            arr = arr.concat(this.destructChainIdOrAssetNameData(data.chainId));
+        }else{
+            arr = arr.concat([data.namespace, data.reference]);
+        }
+        arr.push(data.address)
+        return arr;
+    }
+
+    destructAssetTypeData(data: Partial<AssetType & ChainIdParams>): string [] {
+        let arr = [];
+        if(data.chainId){
+            arr = arr.concat(this.destructChainIdOrAssetNameData(data.chainId));
+        }else{
+            arr = arr.concat([undefined, undefined]);
+        }
+        if(data.assetName){
+            arr = arr.concat(this.destructChainIdOrAssetNameData(data.assetName));
+        }else{
+            arr = arr.concat([data.namespace, data.reference])
+        }
+        return arr;
+    }
+
+    destructAssetIdObject(data: Partial<AssetId & ChainIdParams>): string[] {
+        let arr = []
+        if(data.chainId !== undefined){
+            arr = arr.concat(this.destructChainIdOrAssetNameData(data.chainId));
+        }else{
+            // Undefined will cause the validator to throw Invalid Argument error
+            arr = arr.concat([undefined, undefined]);
+        }
+        if(data.assetName !== undefined) {
+            arr = arr.concat(this.destructChainIdOrAssetNameData(data.assetName))
+        }else if (data.namespace && data.reference){
+            arr = arr.concat([data.namespace, data.reference]);
+        }
+        arr.push(data.tokenId);
+
+        return arr;
     }
 
 
@@ -153,11 +220,16 @@ export class ChainAgnostic {
         if(spec.parameters === undefined) return [];
 
         let specs: ChainIdentifierSpec[] = [];
-        for(const value of Object.values(spec.parameters.values)){
+        for(let value of Object.values(spec.parameters.values)){
             if(value.parameters){
                 specs = specs.concat(this.flattenChainIdentifierSpec(value))
             }else {
-                specs.push(value);
+                const newSpec = value;
+                if(this.parentSpecNamesToIncludeInError.includes(spec.name)){
+                    newSpec.parentName = spec.name;
+                }
+                
+                specs.push(newSpec);
             }
         }
         return specs;
@@ -193,8 +265,14 @@ export class ChainAgnostic {
             throw new MissingChainAgnosticArgument(flattenIdentifierSpec[data.length].name);
         }
         for(const index in data){
-            if(!this.isChainIdentifierSpecRegexValid(data[index], flattenIdentifierSpec[index])){
-                throw new InvalidChainAgnosticArgument(flattenIdentifierSpec[index].name, data[index]);
+            let parentNameOfSpec = flattenIdentifierSpec[index].parentName ? flattenIdentifierSpec[index] . parentName + " " : '';
+            if(data[index] === undefined) {
+                let name = parentNameOfSpec.length > 0 ? parentNameOfSpec + ' ' +flattenIdentifierSpec[index].name : flattenIdentifierSpec[index].name
+                throw new MissingChainAgnosticArgument(name)
+            }
+            if(!this.isChainIdentifierSpecRegexValid(data[index], flattenIdentifierSpec[index]) || data[index] === undefined){
+                
+                throw new InvalidChainAgnosticArgument(flattenIdentifierSpec[index].name, data[index], parentNameOfSpec);
             }
         }
         return true;
@@ -214,18 +292,60 @@ export class ChainAgnostic {
     }
 
 
+    getCurrentIdentifierSpecName(): ChainAgnosticIdentifierSpecNames {
+        if(this.tokenId) return ChainAgnosticIdentifierSpecNames.AssetId;
+        if(this.assetName && this.chainId) return ChainAgnosticIdentifierSpecNames.AssetType;
+        if(this.address) return ChainAgnosticIdentifierSpecNames.AccountId;
+        return ChainAgnosticIdentifierSpecNames.ChainId;
+    }
 
 
-    // getChainId(): ChainIdParams {}
+    toJSON(): ChainIdParams | AccountIdParams  | AssetIdParams | AssetTypeParams {
+        switch(this.getCurrentIdentifierSpecName()){
+            case ChainAgnosticIdentifierSpecNames.AssetId:
+                return this.getAssetId();
+            case ChainAgnosticIdentifierSpecNames.AssetType:
+                return this.getAssetType();
+            case ChainAgnosticIdentifierSpecNames.AccountId:
+                return this.getAccountId();
+            default:
+                return this.getChainId();
+        }
+    }
+
+
+    getChainId(): ChainIdParams {
+        return Object.assign(this.chainId);
+    }
     // getChainIdString(): string {}
 
-    // getAccountId(): AccountIdParams {}
+    getAccountId(): AccountIdParams {
+        return {
+            chainId: this.chainId,
+            address: this.address
+        }
+    }
     // getAccountIdString(): string {}
 
-    // getAssetName(): ChainAgnosticData["assetName"] {}
+    getAssetName(): AssetNameParams {
+        return Object.assign(this.assetName);
+    }
     // getAssetNameString(): string {}
 
-    // getAssetId(): AssetIdParams {}
+    getAssetType(): AssetTypeParams {
+        return {
+            chainId: this.chainId,
+            assetName: this.assetName
+        }
+    }
+
+    getAssetId(): AssetIdParams {
+        return {
+            chainId: this.chainId,
+            assetName: this.assetName,
+            tokenId: this.tokenId
+        }
+    }
     // getAssetIdString(): string {}
 
     // toJSON(): ChainAgnosticData {}

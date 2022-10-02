@@ -174,28 +174,32 @@ describe("ChainAgnostic Parsing", () => {
        
     });
 
-    // it("should throw invalid argument error", () => {
-    //     const invalidArgumentsFixtures = fixture.filter((json) => json.hasError && json.errorMessage !== undefined && json.errorMessage.includes('Invalid argument'));
-    //     expect(invalidArgumentsFixtures.length).toBeGreaterThan(0);
-    //     for(const data of invalidArgumentsFixtures){
-    //         try{
+    it("should throw invalid argument error", () => {
+        const invalidArgumentsFixtures = fixture.filter((json) => json.hasError && json.errorMessage !== undefined && json.errorMessage.includes('Invalid argument'));
+        expect(invalidArgumentsFixtures.length).toBeGreaterThan(0);
+        for(const data of invalidArgumentsFixtures){
+            try{
  
-    //              const caip = new ChainAgnostic(data.in);
-    //              throw new ExpectingTestToFail(`${data.in} was expected to throw ${data.errorMessage}`)
+                 const caip = new ChainAgnostic(data.in);
+                 throw new ExpectingTestToFail(`${data.in} was expected to throw ${data.errorMessage}`)
                  
-    //          }catch(e){
-    //              expect(e.message).toEqual(data.errorMessage);
-    //          }
-    //      }
-    // });
+             }catch(e){
+                 expect(e.message).toEqual(data.errorMessage);
+             }
+         }
+    });
 
-    // it("must succeed", () => {
-    //     const successfulFixtures = fixture.filter((json) => json.hasError === false);
-    //     expect(successfulFixtures.length).toBeGreaterThan(0);
-    //     for(const data of successfulFixtures){
-    //         const caip = new ChainAgnostic(data.in);
-    //         expect(caip.toJSON()).toStrictEqual(data.out);
-    //     }
-    // })
+    it("must succeed", () => {
+        const successfulFixtures = fixture.filter((json) => json.hasError === false);
+        expect(successfulFixtures.length).toBeGreaterThan(0);
+        for(const data of successfulFixtures){
+            const caip = new ChainAgnostic(data.in);
+            expect(caip.toJSON()).toStrictEqual(data.out);
+            if(data.out["assetName"] !== undefined){
+                expect(caip.namespace).toEqual(data.out["assetName"]["namespace"]);
+                expect(caip.reference).toEqual(data.out["assetName"]["reference"]);
+            }
+        }
+    })
     
 });

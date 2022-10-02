@@ -7,7 +7,7 @@
         {
             "in": "eip155:",
             "hasError": true,
-            "errorMessage": "Invalid argument (namespace does not accept '' as value)"
+            "errorMessage": "Invalid argument (reference does not accept '' as value)"
         },
         {
             "in": "#",
@@ -61,8 +61,6 @@
             "hasError": false,
             "out": {
                 "address": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
-                "namespace":"eip155",
-                "reference": "1",
                 "chainId": {
                     "namespace":"eip155",
                     "reference":"1"
@@ -83,7 +81,6 @@
             "in": "eip155:1/erc721",
             "hasError":true,
             "out":{
-                "namespace": "erc721",
                 "chainId": {
                     "namespace": "eip155",
                     "reference":"1"
@@ -99,8 +96,6 @@
             "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
             "hasError":false,
             "out":{
-                "namespace": "erc721",
-                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
                 "assetName": {
                     "namespace": "erc721",
                     "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
@@ -125,8 +120,6 @@
             "in": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/1",
             "hasError":false,
             "out":{
-                "namespace": "erc721",
-                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
                 "tokenId": "1",
                 "assetName": {
                     "namespace": "erc721",
@@ -142,8 +135,6 @@
             "in": "eip155:4/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
             "hasError": false,
             "out": {
-                "namespace": "erc721",
-                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
                 "assetName": {
                     "namespace": "erc721",
                     "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
@@ -158,8 +149,6 @@
             "in": ["eip155","1","erc721","0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb","1"],
             "hasError": true,
             "out": {
-                "namespace": "erc721",
-                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
                 "assetName": {
                     "namespace":"erc721",
                     "reference":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"

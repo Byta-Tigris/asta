@@ -1,10 +1,19 @@
 import { ExpectingTestToFail, InvalidChainAgnosticArgument, MissingChainAgnosticArgument } from "@asta/errors";
 import { ChainAgnostic } from "@asta/packages/chain-agnostic";
 import { ChainIdentifierSpecData } from "@asta/packages/chain-agnostic/chain-specs"
-import { ChainIdentifierSpec } from "@asta/packages/chain-agnostic/types";
+import { ChainAgnosticData, ChainIdentifierSpec } from "@asta/packages/chain-agnostic/types";
+import objectDataFixtureJSON from "./object-data.fixture.json"
 
 
 describe("Unit testing ChainAgnostic", () => {
+    interface Fixture {
+        in:  object,
+        hasError: boolean,
+        error?: string,
+        out?: object
+    }
+
+    const objectFixture = objectDataFixtureJSON as Fixture[];
 
     it("should split string with '/'", () => {
         const fixtures = [
@@ -157,6 +166,28 @@ describe("Unit testing ChainAgnostic", () => {
 
         for(const fixtureData of fixture){
             expect(ChainAgnostic.isChainIdentifierSpecDataValid(fixtureData[0] as string[], fixtureData[1] as ChainIdentifierSpec)).toBe(true)
+        }
+    })
+
+    it("object as constructor data must throw error", () => {
+        const fixtures = objectFixture.filter((fix) => fix.hasError);
+        for(const fixtureData of fixtures){
+            try {
+                const caip = new ChainAgnostic(fixtureData.in as ChainAgnosticData);
+                throw new ExpectingTestToFail(`Expected to throw: ${fixtureData.error}`)
+            }catch(e){
+                expect(e.message).toEqual(fixtureData.error)
+            }
+        }
+    });
+
+    it("object as constructor data must pass", () => {
+        const fixtures = objectFixture.filter((fix) =>  !fix.hasError);
+        for(const fixtureData of fixtures){
+            const caip = new ChainAgnostic(fixtureData.in as ChainAgnosticData);
+            const jsonData = caip.toJSON();
+            expect(jsonData).toBeDefined();
+            expect(jsonData).toStrictEqual(fixtureData.out)
         }
     })
 })
