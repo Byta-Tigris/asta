@@ -1,4 +1,5 @@
 import {
+  FailedFormatDueToMissingArgument,
   InvalidChainAgnosticArgument,
   MissingChainAgnosticArgument,
 } from '@asta/errors';
@@ -396,6 +397,13 @@ export class ChainAgnostic {
     return Object.assign(this.chainId);
   }
   getChainIdString(): string {
+    if (this.chainId === undefined)
+      throw new FailedFormatDueToMissingArgument('chainId');
+    if (this.chainId.namespace === undefined)
+      throw new FailedFormatDueToMissingArgument('namespace');
+    if (this.chainId.reference === undefined)
+      throw new FailedFormatDueToMissingArgument('reference');
+
     return `${this.chainId.namespace}:${this.chainId.reference}`;
   }
 
@@ -405,18 +413,34 @@ export class ChainAgnostic {
       address: this.address,
     };
   }
-  // getAccountIdString(): string {}
+  getAccountIdString(): string {
+    if (this.address === undefined)
+      throw new FailedFormatDueToMissingArgument('address');
+    return `${this.getChainIdString()}:${this.address}`;
+  }
 
   getAssetName(): AssetNameParams {
     return Object.assign(this.assetName);
   }
-  // getAssetNameString(): string {}
+  getAssetNameString(): string {
+    if (this.assetName === undefined)
+      throw new FailedFormatDueToMissingArgument('assetName');
+    if (this.assetName.namespace === undefined)
+      throw new FailedFormatDueToMissingArgument('assetName namespace');
+    if (this.assetName.reference === undefined)
+      throw new FailedFormatDueToMissingArgument('assetName reference');
+    return `${this.assetName.namespace}:${this.assetName.reference}`;
+  }
 
   getAssetType(): AssetTypeParams {
     return {
       chainId: this.chainId,
       assetName: this.assetName,
     };
+  }
+
+  getAssetTypeString(): string {
+    return `${this.getChainIdString()}/${this.getAssetNameString()}`;
   }
 
   getAssetId(): AssetIdParams {
@@ -426,8 +450,25 @@ export class ChainAgnostic {
       tokenId: this.tokenId,
     };
   }
-  // getAssetIdString(): string {}
+  getAssetIdString(): string {
+    if (this.tokenId === undefined)
+      throw new FailedFormatDueToMissingArgument('tokenId');
+    return `${this.getAssetTypeString()}/${this.tokenId}`;
+  }
 
-  // toJSON(): ChainAgnosticData {}
-  // toString(): string {}
+  format(): string {
+    switch (this.getCurrentIdentifierSpecName()) {
+      case ChainAgnosticIdentifierSpecNames.AssetId:
+        return this.getAssetIdString();
+      case ChainAgnosticIdentifierSpecNames.AssetType:
+        return this.getAssetTypeString();
+      case ChainAgnosticIdentifierSpecNames.AccountId:
+        return this.getAccountIdString();
+      default:
+        return this.getChainIdString();
+    }
+  }
+  toString(): string {
+    return this.format();
+  }
 }

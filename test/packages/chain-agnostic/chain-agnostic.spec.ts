@@ -10,16 +10,18 @@ import {
   ChainIdentifierSpec,
 } from '@asta/packages/chain-agnostic/types';
 import objectDataFixtureJSON from './object-data.fixture.json';
+import formatDataFixtureJSON from './format.fixture.json';
 
 describe('Unit testing ChainAgnostic', () => {
   interface Fixture {
     in: object;
     hasError: boolean;
     error?: string;
-    out?: object;
+    out?: object | string;
   }
 
   const objectFixture = objectDataFixtureJSON as Fixture[];
+  const formatFixture = formatDataFixtureJSON as Fixture[];
 
   it("should split string with '/'", () => {
     const fixtures = [
@@ -241,7 +243,7 @@ describe('Unit testing ChainAgnostic', () => {
     const fixtures = objectFixture.filter((fix) => fix.hasError);
     for (const fixtureData of fixtures) {
       try {
-        const caip = new ChainAgnostic(fixtureData.in as ChainAgnosticData);
+        new ChainAgnostic(fixtureData.in as ChainAgnosticData);
         throw new ExpectingTestToFail(
           `Expected to throw: ${fixtureData.error}`,
         );
@@ -258,6 +260,13 @@ describe('Unit testing ChainAgnostic', () => {
       const jsonData = caip.toJSON();
       expect(jsonData).toBeDefined();
       expect(jsonData).toStrictEqual(fixtureData.out);
+    }
+  });
+
+  it('must format the properties to string according to the format', () => {
+    for (const fixtureData of formatFixture) {
+      const caip = new ChainAgnostic(fixtureData.in as ChainAgnosticData);
+      expect(caip.format()).toEqual(fixtureData.out);
     }
   });
 });

@@ -17,3 +17,9 @@ export class MissingChainAgnosticArgument extends ChainAgnosticError {
     super(`Missing argument (${propertyName} not provided)`);
   }
 }
+
+export class FailedFormatDueToMissingArgument extends ChainAgnosticError {
+  constructor(propertyName: string) {
+    super(`Failed to format, ${propertyName} is missing`);
+  }
+}
