@@ -1,0 +1,38 @@
+[
+    {
+        "in": {
+            "namespace": "eip155",
+            "reference": "1"
+        },
+        "hasError": false,
+        "out": "eip155:1"
+    },
+    {
+        "in": {
+            "chainId": {"namespace": "eip155", "reference":"1"},
+            "address": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+        },
+        "hasError": false,
+        "out": "eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+    },
+    {
+        "in": {
+            "chainId": "eip155:2",
+            "address":"0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+        },
+        "hasError": false,
+        "out": "eip155:2:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+    },
+    {
+        "in": {
+            "chainId": {"namespace": "eip155", "reference": "1"},
+            "assetName": {
+                "namespace": "erc721",
+                "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+            },
+            "tokenId": "1"
+        },
+        "hasError": false,
+        "out": "eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb/1"
+    }
+]

@@ -1,0 +1,47 @@
+[
+    {
+        "in": "eip155:*",
+        "matches": [
+            ["eip155:56", true],
+            ["eip155:5698", true],
+            ["cosmos:1", false],
+            ["eip155:2:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", false]
+        ]
+    },
+    {
+        "in": "eip155:1:*",
+        "matches": [
+            ["eip155:56", false],
+            ["eip155:1", false],
+            ["eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:2:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", false]
+        ]
+    },
+    {
+        "in":"eip155:*:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+        "matches": [
+            ["eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfc562", false],
+            ["eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:2:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:1#:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", false],
+            ["eip155:*:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", false]
+        ]
+    },
+    {
+        "in": "eip155:*:*",
+        "matches": [
+            ["eip155:56", false],
+            ["eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:56:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:1:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcd3", true]
+        ]
+    },
+    {
+        "in": "eip155:1/*:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb",
+        "matches": [
+            ["eip155:1/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:1/erc898:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", true],
+            ["eip155:1w/erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb", false]
+        ]
+    }
+]

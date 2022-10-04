@@ -41,6 +41,8 @@ export class ChainAgnostic {
     ChainAgnosticIdentifierSpecNames.AssetName,
   ];
 
+  private static specNamesNotSupportingWildCardPattern: string[] = [];
+
   private static colonDelim = ':';
   private static slashDelim = '/';
 
@@ -340,6 +342,17 @@ export class ChainAgnostic {
             : flattenIdentifierSpec[index].name;
         throw new MissingChainAgnosticArgument(name);
       }
+      // When setting the arguments if any of the provided argument is wildcard `*`
+      // and the Spec name is not present in the `specNamesNotSUpportingWildCardPattern` array
+      // it will be marked as valid data without regex confirmation
+      if (
+        args[index] === '*' &&
+        !ChainAgnostic.specNamesNotSupportingWildCardPattern.includes(
+          flattenIdentifierSpec[index].name,
+        )
+      ) {
+        return true;
+      }
       if (
         !this.isChainIdentifierSpecRegexValid(
           args[index],
@@ -470,5 +483,42 @@ export class ChainAgnostic {
   }
   toString(): string {
     return this.format();
+  }
+
+  private static matchProperty(
+    comparator: string,
+    target: string,
+    spec: ChainIdentifierSpec,
+    isWildCardAllowed = true,
+  ): boolean {
+    if (comparator === undefined || target === undefined) return false;
+    return (
+      spec !== undefined &&
+      spec.regex !== undefined &&
+      this.isValidRegex(spec.regex, target) &&
+      ((comparator === '*' && isWildCardAllowed) || comparator === target)
+    );
+  }
+
+  match(matcherString: string): boolean {
+    const currentFormattedCAIPString = this.format();
+    const currentCAIPFragments = ChainAgnostic.createFragments(
+      currentFormattedCAIPString,
+    );
+    const matcherStringFragments = ChainAgnostic.createFragments(matcherString);
+    if (currentCAIPFragments.length !== matcherStringFragments.length)
+      return false;
+    const currentSpecName = this.getCurrentIdentifierSpecName();
+    const spec = this.chainIdentifierSpecData[currentSpecName];
+    const flattenIdentifierSpec =
+      ChainAgnostic.flattenChainIdentifierSpec(spec);
+    return matcherStringFragments.every((value, index) =>
+      ChainAgnostic.matchProperty(
+        currentCAIPFragments[index],
+        value,
+        flattenIdentifierSpec[index],
+        true,
+      ),
+    );
   }
 }
