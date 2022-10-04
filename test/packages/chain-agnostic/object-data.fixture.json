@@ -1,0 +1,110 @@
+[
+    {
+     "in": {},
+     "hasError": true,
+     "error": "Missing argument (namespace not provided)"
+    },
+    {
+     "in": {"namespace": "eip155"},
+     "hasError": true,
+     "error": "Missing argument (reference not provided)"
+    },
+    {
+     "in":{"namespace": "eip155", "reference": "1#"},
+     "hasError": true,
+     "error": "Invalid argument (reference does not accept '1#' as value)"
+    },
+    {
+     "in": {"namespace":  "eip155", "reference": "1"},
+     "hasError": false,
+     "out": {"namespace": "eip155", "reference": "1"}
+     
+    },
+    {
+     "in": {"namespace":  "eip155", "reference": "1", "address": "0x98645>"},
+     "hasError": true,
+     "error": "Invalid argument (address does not accept '0x98645>' as value)"
+    },
+    {
+     "in": {"namespace":  "eip155", "reference": "1", "address": "0x98645"},
+     "hasError": false,
+     "out": {
+         "chainId": {"namespace":  "eip155", "reference": "1"},
+         "address": "0x98645"
+     }
+    },
+    {
+     "in": {"chainId": "eip155:1", "address": "0x98645"},
+     "hasError": false,
+     "out": {
+         "chainId": {"namespace": "eip155", "reference": "1"},
+         "address": "0x98645"
+     }
+    },
+    {
+        "in": {"namespace": "eip155", "reference": "1", "address": "0x98645"},
+        "hasError": false,
+        "out": {
+            "chainId": {"namespace": "eip155", "reference": "1"},
+            "address": "0x98645"
+        }
+    },
+    {
+        "in":{"chainId": "eip155:1",
+               "namespace": "erc721",
+               "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+        },
+         "hasError":false,
+         "out": {
+           "chainId": {"namespace": "eip155", "reference": "1"},
+           "assetName": {
+               "namespace": "erc721",
+               "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+           }
+         }
+       },
+    {
+     "in":{"chainId": "eip155:1",
+            "assetName": {
+            "namespace": "erc721",
+            "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+      }},
+      "hasError":false,
+      "out": {
+        "chainId": {"namespace": "eip155", "reference": "1"},
+        "assetName": {
+            "namespace": "erc721",
+            "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+        }
+      }
+    },
+    {
+        "in":{"chainId": "eip155:1",
+               "assetName": "erc721:0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb"
+        },
+         "hasError":false,
+         "out": {
+           "chainId": {"namespace": "eip155", "reference": "1"},
+           "assetName": {
+               "namespace": "erc721",
+               "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+           }
+         }
+       },
+       {
+        "in":{"chainId": "eip155:1",
+               "tokenId": "23",
+               "namespace": "erc721",
+               "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+         },
+         "hasError":false,
+         "out": {
+           "chainId": {"namespace": "eip155", "reference": "1"},
+           "assetName": {
+               "namespace": "erc721",
+               "reference": "0xab16a96d359ec26a11e2c2b3d8f8b8942d5bfcdb" 
+           },
+           "tokenId": "23"
+         }
+       }
+ ]
