@@ -23,3 +23,12 @@ export class FailedFormatDueToMissingArgument extends ChainAgnosticError {
         super(`Failed to format, ${propertyName} is missing`);
     }
 }
+
+export class ValidatorError extends AstaError {}
+
+export class SelectorError extends ValidatorError {}
+export class UnsupportedSelectorSpecError extends SelectorError {
+    constructor(val: unknown) {
+        super(`Selection against the spec is not supported, spec: ${val}`);
+    }
+}
