@@ -15,13 +15,14 @@ export type SelectorInputSpecType =
     | Record<string, string>;
 
 // Output of selection when single string is used as selector
-export interface SelectorOutputWithSingleSelectionType<T = unknown> {
-    __default__: T;
+export const SingleSelectorOutputKeyName = '__default__';
+export interface SelectorOutputWithSingleSelectionType<T = unknown>
+    extends Record<string, unknown> {
+    [SingleSelectorOutputKeyName]: T;
 }
 // Expected output from selector spec
 export type SelectorOutputDataType<T = unknown> =
-    | T
-    | Record<string, T>
+    | Record<string, unknown>
     | SelectorOutputWithSingleSelectionType<T>;
 
 export enum SelectionDataSource {

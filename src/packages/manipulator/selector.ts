@@ -2,7 +2,8 @@ import { UnsupportedSelectorSpecError } from '@asta/errors';
 import {
     SelectionDataSource,
     SelectorInputSpecType,
-    SelectorOutputDataType
+    SelectorOutputDataType,
+    SingleSelectorOutputKeyName
 } from './types';
 
 class Queue<T> {
@@ -76,7 +77,18 @@ export class Selector {
 
         return foundValues[0] as T;
     }
-
+    /**
+     * Search for the properties in the argument object using the selector spec and source using BFS.
+     * source is used to specifically target nested object in the argument avoiding all other values.
+     *
+     * @param arg The data argument (an Object) from which required property will be selected
+     * @param selectorSpec Selector spec for selection
+     * @param source property name of the targeted data source
+     * @returns Selected values as object
+     *
+     * @throws {@link UnsupportedSelectorSpecError} when selectorSpec is not supported.
+     * any value other than `string`, `Array<string>` or Object will trigger the error
+     */
     static findPropertyUsingSelector<T = unknown>(
         arg: Record<string, unknown>,
         selectorSpec: SelectorInputSpecType,
@@ -84,7 +96,11 @@ export class Selector {
     ): SelectorOutputDataType<T> {
         if (typeof selectorSpec === 'string') {
             return {
-                __default__: this.findProperty(arg, selectorSpec, source)
+                [SingleSelectorOutputKeyName]: this.findProperty(
+                    arg,
+                    selectorSpec,
+                    source
+                )
             };
         }
         if (Array.isArray(selectorSpec)) {
