@@ -32,3 +32,5 @@ export class UnsupportedSelectorSpecError extends SelectorError {
         super(`Selection against the spec is not supported, spec: ${val}`);
     }
 }
+
+export class SchemaValidatorError extends ValidatorError {}
