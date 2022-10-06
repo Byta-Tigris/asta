@@ -24,13 +24,19 @@ export class FailedFormatDueToMissingArgument extends ChainAgnosticError {
     }
 }
 
-export class ValidatorError extends AstaError {}
+export class ManipulatorError extends AstaError {}
 
-export class SelectorError extends ValidatorError {}
+export class SelectorError extends ManipulatorError {}
 export class UnsupportedSelectorSpecError extends SelectorError {
     constructor(val: unknown) {
         super(`Selection against the spec is not supported, spec: ${val}`);
     }
 }
 
-export class SchemaValidatorError extends ValidatorError {}
+export class SchemaValidatorError extends ManipulatorError {}
+
+export class MissingSelectorSpec extends ManipulatorError {
+    constructor() {
+        super('Selector spec is missing');
+    }
+}

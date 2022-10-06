@@ -28,7 +28,7 @@ describe('Transformer testing', () => {
                 }
             }
         },
-        [SingleSelectorOutputKeyName]: 'Agent'
+        [SingleSelectorOutputKeyName]: { value: 'Agent' }
     };
 
     it('toValue testing', () => {
@@ -56,6 +56,20 @@ describe('Transformer testing', () => {
                 {
                     age: 27,
                     name: { firstName: 'Sonoo', lastName: 'Jaiswal' }
+                }
+            ],
+            [
+                {
+                    age: 'age',
+                    detail: ['firstName', 'lastName', { address: 'address' }]
+                },
+                {
+                    age: 27,
+                    detail: [
+                        'Sonoo',
+                        'Jaiswal',
+                        { address: jsonObject.address }
+                    ]
                 }
             ],
             [undefined, jsonObject]

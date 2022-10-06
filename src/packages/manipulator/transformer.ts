@@ -1,5 +1,6 @@
 import {
     SelectorOutputDataType,
+    SelectorOutputWithSingleSelectionType,
     SingleSelectorOutputKeyName,
     TransformerFunction
 } from './types';
@@ -10,6 +11,10 @@ export function toValue<T = unknown>(
     return function (data: SelectorOutputDataType<T>): T {
         if (data === undefined) return;
         if (typeof data === 'object') {
+            if (keyName === SingleSelectorOutputKeyName)
+                return (data as SelectorOutputWithSingleSelectionType<T>)[
+                    SingleSelectorOutputKeyName
+                ].value as T;
             return data[keyName] as T;
         }
     };
@@ -24,7 +29,23 @@ function createObjectFromAnotherObject<T = Record<string, unknown>>(
         if (typeof value === 'string') {
             newObject[key] = source[value];
         } else if (typeof value === 'object') {
-            newObject[key] = createObjectFromAnotherObject(source, value);
+            // Object is array containing names of properties
+            if (Array.isArray(value)) {
+                newObject[key] = [];
+                for (const arrayKey of value) {
+                    // Property name
+                    if (typeof arrayKey === 'string') {
+                        newObject[key].push(source[arrayKey]);
+                    } else if (typeof arrayKey === 'object') {
+                        // Another object
+                        newObject[key].push(
+                            createObjectFromAnotherObject(source, arrayKey)
+                        );
+                    }
+                }
+            } else {
+                newObject[key] = createObjectFromAnotherObject(source, value);
+            }
         }
     }
     return newObject as T;
@@ -48,5 +69,16 @@ export function toArray<T = unknown[]>(
             newArray.push(data[keyName]);
         }
         return newArray as T;
+    };
+}
+
+export function autoTransformer<T = unknown>(): TransformerFunction<T> {
+    return (data: SelectorOutputDataType): T => {
+        if (typeof data === 'object') {
+            if (data[SingleSelectorOutputKeyName] !== undefined)
+                return toValue<T>()(data);
+            return toObject<T>()(data);
+        }
+        return data;
     };
 }
