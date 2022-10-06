@@ -1,3 +1,5 @@
+import Joi from 'joi';
+
 export interface SyntheticArgumentData extends Record<string, unknown> {
     body?: Record<string, unknown>;
     params?: Record<string, unknown>;
@@ -18,7 +20,7 @@ export type SelectorInputSpecType =
 export const SingleSelectorOutputKeyName = '__default__';
 export interface SelectorOutputWithSingleSelectionType<T = unknown>
     extends Record<string, unknown> {
-    [SingleSelectorOutputKeyName]: T;
+    [SingleSelectorOutputKeyName]: { value: T };
 }
 // Expected output from selector spec
 export type SelectorOutputDataType<T = unknown> =
@@ -31,31 +33,42 @@ export enum SelectionDataSource {
     None = 'none'
 }
 
-export interface TransformerFunction<T, R = unknown> {
+export interface TransformerFunction<T = unknown, R = unknown> {
     (data: SelectorOutputDataType<R>): T;
 }
 
-export interface SchemaValidatorFunction<S = object, T = unknown> {
-    (schema: S, data: T): T;
+export interface SchemaValidatorFunction<T = unknown> {
+    (data: T): T;
 }
 
 export interface GetSelectorSpecFunction {
     (): SelectorInputSpecType;
 }
 
-export interface ArgumentTransform {
+export interface IArgumentTransformer {
     transform<T, R = unknown>(data: SelectorOutputDataType<R>): T;
 }
 
-export interface ArgumentSelector {
+export interface IArgumentSelector {
     getSelectorSpec(): SelectorInputSpecType;
 }
 
-export interface ArgumentSchemaValidator {
-    validateSchema<S = object, T = unknown>(schema: S, data: T): T;
+export interface IArgumentSchemaValidator {
+    validateSchema<T = unknown>(data: T): T;
 }
 
-export interface ArgumentManipulator
-    extends ArgumentSelector,
-        ArgumentTransform,
-        ArgumentSchemaValidator {}
+export interface IArgumentManipulator
+    extends IArgumentSelector,
+        IArgumentTransformer,
+        IArgumentSchemaValidator {}
+
+export interface ArgumentManipulationData<T = unknown> {
+    selectorSpec: SelectorInputSpecType;
+    transformer?: TransformerFunction<T>;
+    source: SelectionDataSource;
+    schemaValidator?: SchemaValidatorFunction;
+}
+
+export interface MethodManipulationHolder {
+    [k: string]: Record<number, ArgumentManipulationData>;
+}

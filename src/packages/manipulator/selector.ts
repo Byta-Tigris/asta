@@ -96,11 +96,9 @@ export class Selector {
     ): SelectorOutputDataType<T> {
         if (typeof selectorSpec === 'string') {
             return {
-                [SingleSelectorOutputKeyName]: this.findProperty(
-                    arg,
-                    selectorSpec,
-                    source
-                )
+                [SingleSelectorOutputKeyName]: {
+                    value: this.findProperty(arg, selectorSpec, source)
+                }
             };
         }
         if (Array.isArray(selectorSpec)) {
