@@ -1,8 +1,8 @@
 import { MissingSelectorSpec } from '@asta/errors';
 import Joi from 'joi';
-import { deferredSchemaValidator, validateSchema } from './schema_validator';
+import { deferredSchemaValidator } from './schema_validator';
 import { Selector } from './selector';
-import { autoTransformer, toObject } from './transformer';
+import { autoTransformer } from './transformer';
 import {
     ArgumentManipulationData,
     IArgumentManipulator,
@@ -153,14 +153,14 @@ function getTransformerFunction(
 ): TransformerFunction {
     if (options.transformer !== undefined) {
         if (options.transformer instanceof ArgumentManipulator) {
-            return options.transformer.transform;
+            return options.transformer.transform.bind(options.transformer);
         }
         return options.transformer as TransformerFunction;
     }
     if (options.manipulator !== undefined) {
-        return options.manipulator.transform;
+        return options.manipulator.transform.bind(options.manipulator);
     }
-    if (selector !== undefined) return selector.transform;
+    if (selector !== undefined) return selector.transform.bind(selector);
     return autoTransformer();
 }
 
@@ -170,14 +170,16 @@ function getSchemaValidator(
 ): SchemaValidatorFunction {
     if (options.schemaValidator !== undefined) {
         if (options.schemaValidator instanceof ArgumentManipulator)
-            return options.schemaValidator.validateSchema;
+            return options.schemaValidator.validateSchema.bind(
+                options.schemaValidator
+            );
         return options.schemaValidator as SchemaValidatorFunction;
     }
     if (options.schema !== undefined)
         return deferredSchemaValidator(options.schema);
     if (options.manipulator !== undefined)
-        return options.manipulator.validateSchema;
-    if (selector !== undefined) return selector.validateSchema;
+        return options.manipulator.validateSchema.bind(options.manipulator);
+    if (selector !== undefined) return selector.validateSchema.bind(selector);
 }
 
 function getManipulatorHolderForMethod(
@@ -194,6 +196,14 @@ function getManipulatorHolderForMethod(
     ];
 }
 
+/**
+ * In case of multiple arguments if any of the argument is not provided or `undefined`
+ * it will try to extract data from previous `SyntheticArgumentData`.
+ *
+ * @param target object where manipulator data is stored
+ * @param memberName name of the method
+ * @param propertyDescriptor description of the method in the object
+ */
 export function Validate(
     target: any,
     memberName: string,
@@ -215,6 +225,15 @@ export function Validate(
                     arg['forSelection'] !== true ||
                     methodManipulators[index] === undefined
                 ) {
+                    // If provided plain data which is not aimed for manipulation
+                    // Will be schema validated for correctness of data
+                    if (
+                        arg !== undefined &&
+                        methodManipulators[index] === undefined &&
+                        methodManipulators[index].schemaValidator !== undefined
+                    ) {
+                        methodManipulators[index].schemaValidator(arg);
+                    }
                     continue;
                 }
                 const parameterManipulator = methodManipulators[index];
