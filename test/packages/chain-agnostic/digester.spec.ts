@@ -1,9 +1,8 @@
 import {
     ChainAgnosticDataDigester,
     EncoderDecoderAlgorithms,
-    ProtocolDataComponentManager,
     ProtocolDataEncoderDecoder
-} from '@asta/packages/chain-agnostic/digester';
+} from '@asta/packages/protocol/digester';
 
 interface EncodingDecodingFixture {
     input: string | Record<string, unknown>;
@@ -57,102 +56,126 @@ const fixtures: EncodingDecodingFixture[] = [
     }
 ];
 
-describe('ChainAgnosticDataDigester ProtocolDataEncoderDecoder testing', () => {
-    it('test encode', () => {
-        for (const data of fixtures.filter(
-            (fixture) => !fixture.hasError && fixture.type === 'encode'
-        )) {
-            expect(
-                ChainAgnosticDataDigester.encode(data.input, data.algoName)
-            ).toEqual(data.output);
-        }
-    });
-    it('test decode', () => {
-        for (const data of fixtures.filter(
-            (fixture) => !fixture.hasError && fixture.type === 'decode'
-        )) {
-            expect(
-                ChainAgnosticDataDigester.decode(data.input as string)
-            ).toStrictEqual(data.output);
-        }
-    });
-});
-
-interface ComponentFixture {
+interface CompleteDecodedRecordFixture {
     input: Record<string, unknown>;
     output: Record<string, unknown>;
 }
 
-const componentFixures: ComponentFixture[] = [
-    {
-        input: {
-            namespace: 'eip155',
-            caip__chainId__namespace: 'eip155',
-            caip__chainId__reference: '1'
-        },
-        output: {
-            namespace: 'eip155',
-            chainId: {
-                namespace: 'eip155',
-                reference: '1'
-            }
-        }
-    },
-    {
-        input: {
-            query: 23,
-            caip__chainId: 'eip155:1',
-            caip__address: '0x9865152'
-        },
-        output: {
-            query: 23,
-            chainId: 'eip155:1',
-            address: '0x9865152'
-        }
-    },
-    {
-        input: {
-            chainId: {
-                namespace: 'cosmos'
-            },
-            caip__chainId__namespace: 'eip155'
-        },
-        output: {
-            chainId: {
-                namespace: 'eip155'
-            }
-        }
-    },
-    {
-        input: {
-            user__data__name: 'stringer',
-            chainId: {
-                namespace: 'cosmos'
-            },
-            caip__chainId__reference: '23'
-        },
-        output: {
-            user__data__name: 'stringer',
-            chainId: {
-                namespace: 'cosmos',
-                reference: '23'
-            }
-        }
-    },
-    {
-        input: {
-            caip__user__id: '23'
-        },
-        output: {
-            caip__user__id: '23'
-        }
-    }
-];
-describe('ChainAgnosticDataDigester ProtocolDataComponentManager testing', () => {
-    it('testing execution of component extraction and combination', () => {
-        for (const fixtureData of componentFixures) {
+describe('ChainAgnosticDataDigester testing', () => {
+    it('test encodeData', () => {
+        for (const data of fixtures.filter(
+            (fixture) => !fixture.hasError && fixture.type === 'encode'
+        )) {
             expect(
-                ProtocolDataComponentManager.execute(fixtureData.input)
+                ChainAgnosticDataDigester.encodeData(data.input, data.algoName)
+            ).toEqual(data.output);
+        }
+    });
+    it('test decodeData', () => {
+        for (const data of fixtures.filter(
+            (fixture) => !fixture.hasError && fixture.type === 'decode'
+        )) {
+            expect(
+                ChainAgnosticDataDigester.decodeData(data.input as string)
+            ).toStrictEqual(data.output);
+        }
+    });
+
+    const completeDecodeFixtures: CompleteDecodedRecordFixture[] = [
+        {
+            input: {
+                chainId: ProtocolDataEncoderDecoder.encode(
+                    'eip155:1',
+                    EncoderDecoderAlgorithms.Base64
+                ),
+                address: '0x9876'
+            },
+            output: {
+                chainId: 'eip155:1',
+                address: '0x9876'
+            }
+        },
+        {
+            input: {
+                accountId: ProtocolDataEncoderDecoder.encode(
+                    'eip155:1:0x987',
+                    EncoderDecoderAlgorithms.Base64
+                )
+            },
+            output: {
+                accountId: 'eip155:1:0x987'
+            }
+        }
+    ];
+    it('testing decode', () => {
+        for (const fixtureData of completeDecodeFixtures) {
+            expect(
+                ChainAgnosticDataDigester.decode(fixtureData.input)
+            ).toStrictEqual(fixtureData.output);
+        }
+    });
+
+    interface SelectCAIPDataFixture {
+        input: Record<string, unknown>;
+        output: Record<string, unknown>;
+    }
+
+    const selectCAIPFixtures: SelectCAIPDataFixture[] = [
+        {
+            input: {
+                nodeId: '25648454',
+                chainId: ChainAgnosticDataDigester.encodeData(
+                    'eip155:1',
+                    EncoderDecoderAlgorithms.Base64
+                )
+            },
+            output: {
+                chainId: {
+                    namespace: 'eip155',
+                    reference: '1'
+                }
+            }
+        },
+        {
+            input: {
+                charter: true,
+                query: 28,
+                accountId: ChainAgnosticDataDigester.encodeData(
+                    'eip155:1:0x9876',
+                    EncoderDecoderAlgorithms.Base64
+                )
+            },
+            output: {
+                accountId: {
+                    chainId: {
+                        namespace: 'eip155',
+                        reference: '1'
+                    },
+                    address: '0x9876'
+                }
+            }
+        },
+        {
+            input: {
+                chainId: ChainAgnosticDataDigester.encodeData(
+                    'eip155:1',
+                    EncoderDecoderAlgorithms.Base64
+                ),
+                address: '0x9876'
+            },
+            output: {
+                chainId: {
+                    namespace: 'eip155',
+                    reference: '1'
+                },
+                address: '0x9876'
+            }
+        }
+    ];
+    it('testing selectCAIPData', () => {
+        for (const fixtureData of selectCAIPFixtures) {
+            expect(
+                ChainAgnosticDataDigester.selectCAIPData(fixtureData.input)[0]
             ).toStrictEqual(fixtureData.output);
         }
     });
