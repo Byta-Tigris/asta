@@ -1,6 +1,7 @@
 export class AstaError extends Error {}
 
-export class ChainAgnosticError extends AstaError {}
+export class ProtocolError extends AstaError {}
+export class ChainAgnosticError extends ProtocolError {}
 
 export class ExpectingTestToFail extends Error {}
 
@@ -24,7 +25,7 @@ export class FailedFormatDueToMissingArgument extends ChainAgnosticError {
     }
 }
 
-export class ManipulatorError extends AstaError {}
+export class ManipulatorError extends ProtocolError {}
 
 export class SelectorError extends ManipulatorError {}
 export class UnsupportedSelectorSpecError extends SelectorError {
@@ -38,5 +39,25 @@ export class SchemaValidatorError extends ManipulatorError {}
 export class MissingSelectorSpec extends ManipulatorError {
     constructor() {
         super('Selector spec is missing');
+    }
+}
+
+export class IncompatibleEncoding extends ProtocolError {
+    constructor(algoName: string, data: string) {
+        super(
+            `${data} is not compatible with encoding algorithm "${algoName}"`
+        );
+    }
+}
+
+export class ProtocolDataDecodingError extends ProtocolError {
+    constructor(data: string, err?: string) {
+        super(`Unable to decode ${data} because of ${err}`);
+    }
+}
+
+export class ProtocolDataEncodingError extends ProtocolError {
+    constructor(data: unknown, err?: string) {
+        super(`Unable to encode ${data} due to ${err}`);
     }
 }
