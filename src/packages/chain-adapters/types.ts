@@ -1,19 +1,23 @@
-export interface GetBlockNumberArg {}
+export interface ChainRPCRequest {
+    id?: string | number;
+}
+
+export interface GetBlockNumberArg extends ChainRPCRequest {}
 export interface GetBlockNumberResponse {}
 
-export interface GetBlockArg {}
+export interface GetBlockArg extends ChainRPCRequest {}
 export interface GetBlockResponse {}
 
-export interface GetBalanceArg {}
+export interface GetBalanceArg extends ChainRPCRequest {}
 export interface GetBalanceResponse {}
 
-export interface GetTransactionBySignatureArg {}
+export interface GetTransactionBySignatureArg extends ChainRPCRequest {}
 export interface GetTransactionBySignatureResponse {}
 
-export interface GetTransactionStatusArg {}
+export interface GetTransactionStatusArg extends ChainRPCRequest {}
 export interface GetTransactionStatusResponse {}
 
-export interface GetTransactionsByAccountArg {}
+export interface GetTransactionsByAccountArg extends ChainRPCRequest {}
 export interface GetTransactionsByAccountResponse {}
 
 export interface VerifySignatureArg {
@@ -28,10 +32,10 @@ export interface VerifySignatureResponse {
     is_verified: boolean;
 }
 
-export interface GetTokenBalanceOfAccountArg {}
+export interface GetTokenBalanceOfAccountArg extends ChainRPCRequest {}
 export interface GetTokenBalanceOfAccountResponse {}
 
-export interface SendRawTransactionArg {}
+export interface SendRawTransactionArg extends ChainRPCRequest {}
 export interface SendRawTransactionResponse {}
 
 export interface CreateWalletArg {}

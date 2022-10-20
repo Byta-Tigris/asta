@@ -77,3 +77,9 @@ export class ProtocolMethodNotSupported extends ProtocolError {
         );
     }
 }
+
+export class ProtocolNodeNotFound extends ProtocolError {
+    constructor() {
+        super('No node found for creating connection');
+    }
+}

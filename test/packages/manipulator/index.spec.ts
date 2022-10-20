@@ -2,7 +2,6 @@ import { SchemaValidatorError } from '@asta/errors';
 import {
     Arg,
     ArgBody,
-    ArgumentManipulator,
     ArgumentTransformer,
     MANIPULATOR_PARAM_NAME,
     Validate
@@ -13,13 +12,11 @@ import {
 } from '@asta/packages/manipulator/transformer';
 import {
     ArgumentManipulationData,
-    SelectorInputSpecType,
     SelectorOutputDataType,
-    SingleSelectorOutputKeyName,
     SyntheticArgumentData,
     SyntheticParameter
 } from '@asta/packages/manipulator/types';
-import Joi, { object } from 'joi';
+import Joi from 'joi';
 
 describe('Complete Manipulator testing', () => {
     // Test Method parameter is binding data

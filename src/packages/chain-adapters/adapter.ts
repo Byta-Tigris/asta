@@ -1,4 +1,4 @@
-import { ProtocolMethodNotSupported } from '@asta/errors';
+import { ProtocolMethodNotSupported, ProtocolNodeNotFound } from '@asta/errors';
 import { ProtocolNode, ProtocolNodeResponse } from '@asta/packages/node/types';
 import { SyntheticParameter } from '../manipulator/types';
 import {
@@ -24,10 +24,16 @@ import {
 } from './types';
 
 export class ProtocolChainAdapter {
-    private node?: ProtocolNode;
+    protected node?: ProtocolNode;
 
     constructor(node?: ProtocolNode) {
         this.node = node;
+    }
+
+    assertNodeExistence(node?: ProtocolNode): void {
+        if (node === undefined) {
+            throw new ProtocolNodeNotFound();
+        }
     }
 
     async getBlockNumber(
