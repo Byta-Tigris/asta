@@ -9,7 +9,10 @@ export interface GetBlockArg extends ChainRPCRequest {}
 export interface GetBlockResponse {}
 
 export interface GetBalanceArg extends ChainRPCRequest {}
-export interface GetBalanceResponse {}
+export interface GetBalanceResponse {
+    value: string;
+    symbol: string;
+}
 
 export interface GetTransactionBySignatureArg extends ChainRPCRequest {}
 export interface GetTransactionBySignatureResponse {}

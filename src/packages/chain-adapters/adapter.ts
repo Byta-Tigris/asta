@@ -5,6 +5,7 @@ import {
     CreateWalletArg,
     CreateWalletResponse,
     GetBalanceArg,
+    GetBalanceResponse,
     GetBlockArg,
     GetBlockNumberArg,
     GetBlockNumberResponse,
@@ -50,7 +51,7 @@ export class ProtocolChainAdapter {
 
     async getBalance(
         arg: SyntheticParameter<GetBalanceArg>
-    ): Promise<ProtocolNodeResponse<GetBlockResponse>> {
+    ): Promise<ProtocolNodeResponse<GetBalanceResponse>> {
         throw new ProtocolMethodNotSupported('getBalance');
     }
 

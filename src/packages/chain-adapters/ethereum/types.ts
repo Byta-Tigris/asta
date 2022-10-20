@@ -1,4 +1,5 @@
 import {
+    GetBalanceArg,
     GetBlockArg,
     GetBlockNumberArg,
     GetBlockNumberResponse,
@@ -56,5 +57,11 @@ export interface EthereumGetBlockArg extends GetBlockArg {
     fullTransactionObjects: boolean;
     tag?: EthereumTags;
     hash?: string;
+    blockNumber?: string;
+}
+
+export interface EthereumGetBalanceArg extends GetBalanceArg {
+    address: string;
+    tag?: EthereumTags;
     blockNumber?: string;
 }
