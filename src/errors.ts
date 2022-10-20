@@ -69,3 +69,11 @@ export class ProtocolChainAdapterRequestError extends ProtocolError {
         this.errorCode = code;
     }
 }
+
+export class ProtocolMethodNotSupported extends ProtocolError {
+    constructor(method: string) {
+        super(
+            `Method '${method} is not supported either by chain or protocol platform`
+        );
+    }
+}
