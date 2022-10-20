@@ -61,3 +61,11 @@ export class ProtocolDataEncodingError extends ProtocolError {
         super(`Unable to encode ${data} due to ${err}`);
     }
 }
+
+export class ProtocolChainAdapterRequestError extends ProtocolError {
+    errorCode?: number;
+    constructor(message: string, code?: number) {
+        super(message);
+        this.errorCode = code;
+    }
+}
