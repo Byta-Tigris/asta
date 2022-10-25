@@ -31,7 +31,6 @@ export interface VerifySignatureArg {
 
 export interface VerifySignatureResponse {
     address: string;
-    signature: string;
     is_verified: boolean;
 }
 

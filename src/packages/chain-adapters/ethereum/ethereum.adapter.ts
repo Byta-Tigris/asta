@@ -5,43 +5,60 @@ import {
     EthereumGetBalanceArg,
     EthereumGetBlockArg,
     EthereumGetBlockNumberArg,
-    EthereumGetBlockNumberResponse
+    EthereumGetTokenBalanceOfAccountArg,
+    EthereumGetTokenBalanceOfAccountResponse,
+    EthereumGetTransactionBySignatureArg,
+    EthereumGetTransactionStatusArg,
+    EthereumGetTransactionStatusResponse,
+    EthereumSendRawTransactionArg,
+    EthereumTransaction,
+    EthereumVerifySignatureArg,
+    EthereumVerifySignatureResponse
 } from './types';
 import {
     EthereumGetBalanceManipulator,
     EthereumGetBlockManipulator,
+    EthereumGetTokenBalanceOfAccountManipulator,
+    EthereumGetTransactionBySignatureManipulator,
+    EthereumSendRawTransactionManipulator,
+    EthereumVerifySignatureManipulator,
     GetBlockNumberSchema
 } from './ethereum.manipulators';
 import { ProtocolNodeResponse, ResponseError } from '@asta/packages/node/types';
 import { SyntheticParameter } from '@asta/packages/manipulator/types';
 import { createRPCRequest } from '@asta/packages/node';
-import { GetBalanceResponse } from '../types';
+import {
+    GetBalanceResponse,
+    GetTokenBalanceOfAccountArg,
+    GetTokenBalanceOfAccountResponse
+} from '../types';
+import { ethers } from 'ethers';
 
 export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
     @Validate
     async getBlockNumber(
         @Arg(['id'], { schema: GetBlockNumberSchema })
         arg: SyntheticParameter<EthereumGetBlockNumberArg>
-    ): Promise<
-        ProtocolNodeResponse<EthereumGetBlockNumberResponse, ResponseError>
-    > {
+    ): Promise<ProtocolNodeResponse<string, ResponseError>> {
         this.assertNodeExistence(this.node);
         const method = 'eth_blockNumber';
-        return await createRPCRequest<EthereumGetBlockNumberResponse>(
-            this.node,
-            {
-                id: arg.id as string,
-                method: method,
-                params: []
-            }
-        );
+        const res = await createRPCRequest<string>(this.node, {
+            id: arg.id as string,
+            method: method,
+            params: []
+        });
+        if (res.error) return res;
+        return {
+            error: res.error,
+            result: ethers.BigNumber.from(res.result).toHexString()
+        };
     }
 
     @Validate
     async getBlock(
         @Arg(new EthereumGetBlockManipulator())
         arg: SyntheticParameter<EthereumGetBlockArg>
-    ): Promise<ProtocolNodeResponse<EthereumBlock, ResponseError>> {
+    ): Promise<ProtocolNodeResponse<EthereumBlock | null, ResponseError>> {
         this.assertNodeExistence(this.node);
         const method =
             arg.tag === undefined && arg.blockNumber === undefined
@@ -54,7 +71,7 @@ export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
             params = [arg.hash];
         }
         params.push(arg.fullTransactionObjects);
-        return await createRPCRequest<EthereumBlock>(this.node, {
+        return await createRPCRequest<EthereumBlock | null>(this.node, {
             id: arg.id as string,
             method: method,
             params: params
@@ -83,8 +100,144 @@ export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
         if (res.result) {
             return {
                 result: {
-                    value: res.result,
+                    value: ethers.BigNumber.from(res.result).toString(),
                     symbol: 'wei'
+                }
+            };
+        }
+        return {
+            error: res.error
+        };
+    }
+
+    @Validate
+    async getTransactionBySignature(
+        @Arg(new EthereumGetTransactionBySignatureManipulator())
+        arg: SyntheticParameter<EthereumGetTransactionBySignatureArg>
+    ): Promise<
+        ProtocolNodeResponse<EthereumTransaction | null, ResponseError>
+    > {
+        this.assertNodeExistence(this.node);
+        const method = 'eth_getTransactionByHash';
+        const params = [arg.hash];
+        return await createRPCRequest<EthereumTransaction | null>(this.node, {
+            id: arg.id as string,
+            method: method,
+            params: params
+        });
+    }
+
+    @Validate
+    async getTransactionStatus(
+        @Arg(new EthereumGetTransactionBySignatureManipulator())
+        arg: SyntheticParameter<EthereumGetTransactionStatusArg>
+    ): Promise<
+        ProtocolNodeResponse<
+            EthereumGetTransactionStatusResponse | null,
+            ResponseError
+        >
+    > {
+        this.assertNodeExistence(this.node);
+        const method = 'eth_getTransactionReceipt';
+        const params = [arg.hash];
+        const res =
+            await createRPCRequest<EthereumGetTransactionStatusResponse | null>(
+                this.node,
+                {
+                    id: arg.id as string,
+                    method: method,
+                    params: params
+                }
+            );
+        if (res.result === null) {
+            return {
+                result: {
+                    transactionHash: arg.hash as string,
+                    status: 'pending'
+                }
+            };
+        }
+        return res;
+    }
+
+    @Validate
+    async sendRawTransaction(
+        @Arg(new EthereumSendRawTransactionManipulator())
+        arg: SyntheticParameter<EthereumSendRawTransactionArg>
+    ): Promise<ProtocolNodeResponse<string, ResponseError>> {
+        this.assertNodeExistence(this.node);
+        const method = 'eth_sendRawTransaction';
+        return await createRPCRequest(this.node, {
+            id: arg.id as string,
+            method: method,
+            params: [arg.signature]
+        });
+    }
+
+    @Validate
+    async verifySignature(
+        @Arg(new EthereumVerifySignatureManipulator())
+        arg: SyntheticParameter<EthereumVerifySignatureArg>
+    ): Promise<
+        ProtocolNodeResponse<EthereumVerifySignatureResponse, ResponseError>
+    > {
+        const messageDigest = ethers.utils.arrayify(
+            ethers.utils.toUtf8Bytes(arg.message as string)
+        );
+        const recoveryAddress = ethers.utils.verifyMessage(
+            messageDigest,
+            arg.signature as string
+        );
+        return {
+            result: {
+                is_verified: recoveryAddress === arg.address,
+                address: arg.address as string
+            }
+        };
+    }
+
+    @Validate
+    async getTokenBalanceOfAccount(
+        @Arg(new EthereumGetTokenBalanceOfAccountManipulator())
+        arg: SyntheticParameter<EthereumGetTokenBalanceOfAccountArg>
+    ): Promise<
+        ProtocolNodeResponse<
+            EthereumGetTokenBalanceOfAccountResponse,
+            ResponseError
+        >
+    > {
+        this.assertNodeExistence(this.node);
+        const functionSignature = 'balanceOf(address)';
+        const paddingLength = 64;
+        const method = 'eth_call';
+        const methodId = ethers.utils
+            .keccak256(ethers.utils.toUtf8Bytes(functionSignature))
+            .slice(0, 10);
+        let inputData = arg.address as string;
+        if (inputData.includes('0x')) {
+            // remove "0x" from the address
+            inputData = inputData.slice(2);
+        }
+        // pad the data with '0' until the length is equal to paddingLength
+        inputData = inputData.padStart(paddingLength, '0x');
+        const payload = methodId + inputData;
+        const params = [
+            {
+                from: null,
+                to: arg.token,
+                data: payload
+            }
+        ];
+        const res = await createRPCRequest<string>(this.node, {
+            id: arg.id as string,
+            method: method,
+            params: params
+        });
+        if (res.result) {
+            const balance = ethers.BigNumber.from(res.result).toHexString();
+            return {
+                result: {
+                    balance: balance
                 }
             };
         }

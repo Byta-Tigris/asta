@@ -83,3 +83,9 @@ export class ProtocolNodeNotFound extends ProtocolError {
         super('No node found for creating connection');
     }
 }
+
+export class ProtocolVerifySignatureError extends ProtocolError {
+    constructor(message = 'Unknown error while verifying the signature') {
+        super(message);
+    }
+}

@@ -1,12 +1,11 @@
-import Joi from 'joi';
-
-export interface SyntheticArgumentData extends Record<string, unknown> {
-    body?: Record<string, unknown>;
-    params?: Record<string, unknown>;
+export interface SyntheticArgumentData<T = any>
+    extends Record<string, unknown> {
+    body?: Record<string, unknown> | Partial<T>;
+    params?: Record<string, unknown> | Partial<T>;
     forSelection: boolean;
 }
 
-export type SyntheticParameter<T> = SyntheticArgumentData | T;
+export type SyntheticParameter<T> = SyntheticArgumentData<T> | T;
 
 // Selector related types
 export type Literal = string | number | boolean;
