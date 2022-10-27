@@ -3,6 +3,9 @@
     "rootDir": ".",
     "testEnvironment": "node",
     "testRegex":".spec.ts$",
+    "setupFiles": [
+        "dotenv/config"
+    ],
     "transform": {
         "^.+\\.(t|j)s$": "ts-jest"
     },

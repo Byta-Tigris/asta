@@ -4,12 +4,18 @@ import {
 } from '@asta/packages/manipulator';
 import { validateSchema } from '@asta/packages/manipulator/schema_validator';
 import { SelectorInputSpecType } from '@asta/packages/manipulator/types';
+import { ethers } from 'ethers';
 import Joi from 'joi';
-import { EthereumTags } from './types';
+import {
+    EthereumCreateWalletArg,
+    EthereumGetTransactionsByAccountArg,
+    EthereumTags
+} from './types';
 
 const EthereumRPCRequestSchema = Joi.object({
     id: Joi.alternatives().try(Joi.number(), Joi.string()).required()
 });
+const EthereumAddress = Joi.string().min(40);
 
 export const GetBlockNumberSchema = EthereumRPCRequestSchema;
 
@@ -75,7 +81,7 @@ export class EthereumVerifySignatureManipulator extends ArgumentManipulator {
 
     validateSchema<T = unknown>(data: T): T {
         const schema = EthereumRPCRequestSchema.append({
-            address: Joi.string().required().min(5),
+            address: EthereumAddress,
             signature: Joi.string().required().min(5),
             message: Joi.string().required()
         });
@@ -90,9 +96,62 @@ export class EthereumGetTokenBalanceOfAccountManipulator extends ArgumentManipul
 
     validateSchema<T = unknown>(data: T): T {
         const schema = EthereumRPCRequestSchema.append({
-            token: Joi.string().required().min(5),
-            address: Joi.string().required().min(5)
+            token: EthereumAddress,
+            address: EthereumAddress
         });
+        return validateSchema<T>(schema, data);
+    }
+}
+
+export class EthereumCreateWalletManipulator extends ArgumentManipulator {
+    getSelectorSpec(): SelectorInputSpecType {
+        return ['phrase', 'path'];
+    }
+
+    validateSchema<T = EthereumCreateWalletArg>(data: T): T {
+        const schema = Joi.object({
+            phrase: Joi.string(),
+            path: Joi.string()
+        });
+        const validatedData = validateSchema<EthereumCreateWalletArg>(
+            schema,
+            data
+        );
+        const wallet = ethers.Wallet.createRandom({
+            path: validatedData.path
+        });
+        validatedData.phrase = validatedData.phrase ?? wallet.mnemonic.phrase;
+        validatedData.path = validatedData.path ?? wallet.mnemonic.path;
+        return validatedData as T;
+    }
+}
+
+export class EthereumGetTransactionsByAccountManipulator extends ArgumentManipulator {
+    getSelectorSpec(): SelectorInputSpecType {
+        return [
+            'address',
+            'apiKey',
+            'chain',
+            'startblock',
+            'endblock',
+            'page',
+            'offset',
+            'sort'
+        ];
+    }
+
+    validateSchema<T = EthereumGetTransactionsByAccountArg>(data: T): T {
+        const schema = Joi.object({
+            address: EthereumAddress,
+            apiKey: Joi.string().required(),
+            chain: Joi.string().default('mainnet'),
+            startblock: Joi.string(),
+            endblock: Joi.string(),
+            page: Joi.number(),
+            offset: Joi.number(),
+            sort: Joi.string().allow('asc', 'desc').default('asc')
+        });
+
         return validateSchema<T>(schema, data);
     }
 }

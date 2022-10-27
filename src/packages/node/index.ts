@@ -46,8 +46,16 @@ export async function createAPIRequest<T>(
             request.timeout = node.timeout;
         }
         const res = await axios.request<T>(request);
+        if (200 <= res.status && res.status < 300) {
+            return {
+                result: res.data
+            };
+        }
         return {
-            result: res.data
+            error: {
+                code: res.statusText,
+                message: res.data as string
+            }
         };
     } catch (e) {
         return handleResponseError(e);

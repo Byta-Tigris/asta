@@ -1,4 +1,8 @@
 import {
+    EtherscanRawTransactionsByAccountRequest,
+    EtherscanTransactionsByAccountResponse
+} from '@asta/packages/protocol/etherscan.types';
+import {
     GetBalanceArg,
     GetBlockArg,
     GetBlockNumberArg,
@@ -12,7 +16,11 @@ import {
     VerifySignatureArg,
     VerifySignatureResponse,
     GetTokenBalanceOfAccountArg,
-    GetTokenBalanceOfAccountResponse
+    GetTokenBalanceOfAccountResponse,
+    CreateWalletArg,
+    CreateWalletResponse,
+    GetTransactionsByAccountArg,
+    GetTransactionsByAccountResponse
 } from '../types';
 
 export interface EthereumGetBlockNumberArg extends GetBlockNumberArg {}
@@ -128,3 +136,25 @@ export interface EthereumGetTokenBalanceOfAccountResponse
     extends GetTokenBalanceOfAccountResponse {
     balance: string;
 }
+
+export interface EthereumCreateWalletArg extends CreateWalletArg {
+    phrase?: string;
+    path?: string;
+}
+
+export interface EthereumCreateWalletResponse extends CreateWalletResponse {
+    phrase: string;
+    path: string;
+    privateKey: string;
+    publicKey: string;
+}
+
+export type EthereumGetTransactionsByAccountArg =
+    EtherscanRawTransactionsByAccountRequest &
+        GetTransactionsByAccountArg & {
+            apiKey: string;
+            chain: string;
+        };
+
+// export type EthereumGetTransactionsByAccountResponse =
+//     EtherscanTransactionsByAccountResponse & GetTransactionsByAccountResponse;

@@ -2,12 +2,15 @@ import { ProtocolChainAdapter } from '../adapter';
 import { Arg, Validate } from '@asta/packages/manipulator';
 import {
     EthereumBlock,
+    EthereumCreateWalletArg,
+    EthereumCreateWalletResponse,
     EthereumGetBalanceArg,
     EthereumGetBlockArg,
     EthereumGetBlockNumberArg,
     EthereumGetTokenBalanceOfAccountArg,
     EthereumGetTokenBalanceOfAccountResponse,
     EthereumGetTransactionBySignatureArg,
+    EthereumGetTransactionsByAccountArg,
     EthereumGetTransactionStatusArg,
     EthereumGetTransactionStatusResponse,
     EthereumSendRawTransactionArg,
@@ -16,6 +19,7 @@ import {
     EthereumVerifySignatureResponse
 } from './types';
 import {
+    EthereumCreateWalletManipulator,
     EthereumGetBalanceManipulator,
     EthereumGetBlockManipulator,
     EthereumGetTokenBalanceOfAccountManipulator,
@@ -29,10 +33,16 @@ import { SyntheticParameter } from '@asta/packages/manipulator/types';
 import { createRPCRequest } from '@asta/packages/node';
 import {
     GetBalanceResponse,
-    GetTokenBalanceOfAccountArg,
-    GetTokenBalanceOfAccountResponse
+    GetTransactionsByAccountArg,
+    GetTransactionsByAccountResponse
 } from '../types';
 import { ethers } from 'ethers';
+import { EtherscanAdapter } from '@asta/packages/protocol/etherscan';
+import {
+    EtherscanRawTransactionsByAccountRequest,
+    EtherscanTransactionByAccount,
+    EtherscanTransactionsByAccountRequest
+} from '@asta/packages/protocol/etherscan.types';
 
 export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
     @Validate
@@ -244,5 +254,53 @@ export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
         return {
             error: res.error
         };
+    }
+
+    @Validate
+    async createWallet(
+        @Arg(new EthereumCreateWalletManipulator())
+        arg: SyntheticParameter<EthereumCreateWalletArg>
+    ): Promise<
+        ProtocolNodeResponse<EthereumCreateWalletResponse, ResponseError>
+    > {
+        try {
+            const wallet = ethers.Wallet.fromMnemonic(
+                arg.phrase as string,
+                arg.path as string
+            );
+            const res: EthereumCreateWalletResponse = {
+                phrase: wallet.mnemonic.phrase,
+                path: wallet.mnemonic.path,
+                privateKey: wallet.privateKey,
+                publicKey: wallet.address
+            };
+            return {
+                result: res
+            };
+        } catch (e) {
+            return {
+                error: {
+                    code: '-100',
+                    message:
+                        'Unable create wallet due to wrong "phrase" or "path"'
+                }
+            };
+        }
+    }
+
+    @Validate
+    async getTransactionsByAccount(
+        @Arg(new EthereumGetTokenBalanceOfAccountManipulator())
+        arg: SyntheticParameter<EthereumGetTransactionsByAccountArg>
+    ): Promise<
+        ProtocolNodeResponse<EtherscanTransactionByAccount[], ResponseError>
+    > {
+        const etherscan = new EtherscanAdapter(
+            arg.chain as string,
+            arg.apiKey as string
+        );
+        arg.chain = undefined;
+        const query = arg as EtherscanTransactionsByAccountRequest;
+        return await etherscan.getTransactionsByAccount(query);
     }
 }

@@ -89,3 +89,11 @@ export class ProtocolVerifySignatureError extends ProtocolError {
         super(message);
     }
 }
+
+export class EtherscanError extends ProtocolError {}
+
+export class EtherscanUnsupportedChain extends EtherscanError {
+    constructor(chain: string) {
+        super(`${chain} is not supported by "Protocol"`);
+    }
+}
