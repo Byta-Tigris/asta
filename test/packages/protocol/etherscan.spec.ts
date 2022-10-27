@@ -1,4 +1,5 @@
 import { EtherscanUnsupportedChain } from '@asta/errors';
+import { EthereumChains } from '@asta/packages/protocol/chains';
 import { EtherscanAdapter } from '@asta/packages/protocol/etherscan';
 
 describe('Testing Etherscan', () => {
@@ -13,7 +14,7 @@ describe('Testing Etherscan', () => {
         }
     });
     it('testing getTransactionsByAccount', async () => {
-        const etherscan = new EtherscanAdapter('mainnet', apiKey);
+        const etherscan = new EtherscanAdapter(EthereumChains.Mainnet, apiKey);
         const res = await etherscan.getTransactionsByAccount({
             address: testAddress
         });

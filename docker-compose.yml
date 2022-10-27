@@ -1,14 +1,5 @@
 version: '3.9'
 services:
-  live:
-    build: 
-      context: .
-      dockerfile: Dockerfile.live
-    stdin_open: true
-    tty: true
-    volumes:
-      - .:/app
-      - /app/node_modules
   test:
     build:
       context: .
@@ -16,4 +7,21 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    links:
+      - postgresdb
     command: npm run test
+  postgresdb:
+    image: postgres:15.0-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: on-failure
+    ports:
+      - 5432:5438
+    volumes:
+      - ./docker-data/postgres-data:/var/lib/postgresql/data
+

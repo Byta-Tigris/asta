@@ -1,6 +1,7 @@
 import { EtherscanUnsupportedChain } from '@asta/errors';
 import { createAPIRequest } from '../node';
 import { APIRequest, ProtocolNode, ProtocolNodeResponse } from '../node/types';
+import { EthereumChains } from './chains';
 import {
     EtherscanTransactionByAccount,
     EtherscanTransactionsByAccountRequest,
@@ -13,11 +14,11 @@ export class EtherscanAdapter {
     // Ascii code of 'etherscan' adds up to become 957
     private static errorCode = '000957';
     static endpointMap = {
-        mainnet: 'https://api.etherscan.io/api',
-        goerli: 'https://api-goerli.etherscan.io/api',
-        kovan: 'https://api-kovan.etherscan.io/api',
-        rinkeby: 'https://api-rinkeby.etherscan.io/api',
-        ropsten: 'https://api-ropsten.etherscan.io/api'
+        [EthereumChains.Mainnet]: 'https://api.etherscan.io/api',
+        [EthereumChains.Goerli]: 'https://api-goerli.etherscan.io/api',
+        [EthereumChains.Kovan]: 'https://api-kovan.etherscan.io/api',
+        [EthereumChains.Rinkeby]: 'https://api-rinkeby.etherscan.io/api',
+        [EthereumChains.Ropsten]: 'https://api-ropsten.etherscan.io/api'
     };
 
     constructor(chain: string, apiKey: string) {

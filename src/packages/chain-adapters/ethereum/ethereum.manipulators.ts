@@ -4,6 +4,7 @@ import {
 } from '@asta/packages/manipulator';
 import { validateSchema } from '@asta/packages/manipulator/schema_validator';
 import { SelectorInputSpecType } from '@asta/packages/manipulator/types';
+import { EthereumChains } from '@asta/packages/protocol/chains';
 import { ethers } from 'ethers';
 import Joi from 'joi';
 import {
@@ -131,7 +132,7 @@ export class EthereumGetTransactionsByAccountManipulator extends ArgumentManipul
         return [
             'address',
             'apiKey',
-            'chain',
+            'chainId',
             'startblock',
             'endblock',
             'page',
@@ -144,7 +145,7 @@ export class EthereumGetTransactionsByAccountManipulator extends ArgumentManipul
         const schema = Joi.object({
             address: EthereumAddress,
             apiKey: Joi.string().required(),
-            chain: Joi.string().default('mainnet'),
+            chain: Joi.string().default(EthereumChains.Mainnet),
             startblock: Joi.string(),
             endblock: Joi.string(),
             page: Joi.number(),

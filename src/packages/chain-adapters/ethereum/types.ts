@@ -153,8 +153,5 @@ export type EthereumGetTransactionsByAccountArg =
     EtherscanRawTransactionsByAccountRequest &
         GetTransactionsByAccountArg & {
             apiKey: string;
-            chain: string;
+            chainId: string;
         };
-
-// export type EthereumGetTransactionsByAccountResponse =
-//     EtherscanTransactionsByAccountResponse & GetTransactionsByAccountResponse;
