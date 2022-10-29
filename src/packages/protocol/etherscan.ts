@@ -1,7 +1,7 @@
 import { EtherscanUnsupportedChain } from '@asta/errors';
 import { createAPIRequest } from '../node';
 import { APIRequest, ProtocolNode, ProtocolNodeResponse } from '../node/types';
-import { EthereumChains } from './chains';
+import { EthereumChains } from './chains-router';
 import {
     EtherscanTransactionByAccount,
     EtherscanTransactionsByAccountRequest,

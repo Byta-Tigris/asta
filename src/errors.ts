@@ -97,3 +97,5 @@ export class EtherscanUnsupportedChain extends EtherscanError {
         super(`${chain} is not supported by "Protocol"`);
     }
 }
+
+export class ChainAdapterRouterError extends ProtocolError {}

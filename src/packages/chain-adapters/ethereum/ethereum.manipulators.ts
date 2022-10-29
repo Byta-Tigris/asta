@@ -4,7 +4,7 @@ import {
 } from '@asta/packages/manipulator';
 import { validateSchema } from '@asta/packages/manipulator/schema_validator';
 import { SelectorInputSpecType } from '@asta/packages/manipulator/types';
-import { EthereumChains } from '@asta/packages/protocol/chains';
+import { EthereumChains } from '@asta/packages/protocol/chains-router';
 import { ethers } from 'ethers';
 import Joi from 'joi';
 import {

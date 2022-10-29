@@ -1,5 +1,5 @@
 import { EtherscanUnsupportedChain } from '@asta/errors';
-import { EthereumChains } from '@asta/packages/protocol/chains';
+import { EthereumChains } from '@asta/packages/protocol/chains-router';
 import { EtherscanAdapter } from '@asta/packages/protocol/etherscan';
 
 describe('Testing Etherscan', () => {

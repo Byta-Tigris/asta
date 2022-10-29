@@ -296,10 +296,10 @@ export class EthereumProtocolChainAdapter extends ProtocolChainAdapter {
         ProtocolNodeResponse<EtherscanTransactionByAccount[], ResponseError>
     > {
         const etherscan = new EtherscanAdapter(
-            arg.chain as string,
+            arg.chainId as string,
             arg.apiKey as string
         );
-        arg.chain = undefined;
+        arg.chainId = undefined;
         const query = arg as EtherscanTransactionsByAccountRequest;
         return await etherscan.getTransactionsByAccount(query);
     }
